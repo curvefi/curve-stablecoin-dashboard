@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 from .contracts import (
+    ControllerContract,
     PegKeeperContract,
     PredefinedERC20Contract,
     StableswapContract,
@@ -55,3 +56,38 @@ def get_overall_stats() -> OverallStats:
             controller_collateral=controller_collateral, peg_keepers_collateral=peg_keepers_collateral
         ),
     )
+
+
+class ControllerPosition(BaseModel):
+    address: str
+    collateral: str
+    positions: list[tuple]
+
+
+def get_positions() -> list[ControllerPosition]:
+    controller_collaterals = controller_factory.collaterals
+    controller_controllers = controller_factory.controllers
+    controller_positions = []
+
+    for collateral_addr in controller_collaterals:
+        collateral = PredefinedERC20Contract(collateral_addr)
+        collateral_symbol = collateral.symbol
+        address = controller_controllers[collateral_addr]
+
+        controller = ControllerContract(address)
+        positions = []
+
+        for i in range(controller.n_loans()):
+            user = controller.loans(i)
+            user_state = controller.user_state(user)
+            positions.append((user, *user_state))
+
+        controller_positions.append(
+            ControllerPosition(
+                address=address,
+                collateral=collateral_symbol,
+                positions=positions,
+            )
+        )
+
+    return controller_positions

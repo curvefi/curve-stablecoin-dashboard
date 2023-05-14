@@ -1,6 +1,7 @@
+import pandas as pd
 import streamlit as st
 
-from data.overall_stats import get_overall_stats
+from data.overall_stats import get_overall_stats, get_positions
 
 # Config
 st.set_page_config(page_title="Overall Stats", page_icon=":bar_chart:", layout="wide")
@@ -37,3 +38,11 @@ col3.write(
         ],
     )
 )
+
+# Positions
+positions = get_positions()
+
+for controller in positions:
+    st.write(f"Positions for Controller {controller.address}, collateral - {controller.collateral}:")
+    df = pd.DataFrame(controller.positions, columns=["user", "collateral", "stablecoin", "debt", "N"])
+    st.table(df.astype(str))

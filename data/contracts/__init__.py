@@ -1,5 +1,6 @@
 from settings import settings
 
+from .controller import ControllerContract
 from .controller_factory import ControllerFactoryContract
 from .erc20 import ERC20Contract, PredefinedERC20Contract
 from .peg_keeper import PegKeeperContract
