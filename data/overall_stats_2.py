@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
 from .contracts import (
-    ControllerContract,
-    PegKeeperContract,
-    PredefinedERC20Contract,
-    StableswapContract,
+    amms,
+    collaterals,
     controller_factory,
-    policy,
+    controllers,
+    peg_keepers,
     stablecoin,
+    stableswaps,
 )
 
 
@@ -32,22 +32,19 @@ def get_overall_stats() -> OverallStats:
     controller_debt = controller_factory.total_debt() / stablecoin.precision
 
     controller_collateral = []
-    for collateral_address in controller_factory.collaterals:
-        amm = controller_factory.amms[collateral_address]
-        collateral = PredefinedERC20Contract(collateral_address)
-        amount = collateral.balanceOf(amm)
-        controller_collateral.append(f"{amount:,.2f} {collateral.symbol}")
+    for col_addr, col in collaterals.items():
+        amm = amms[col_addr]
+        amount = col.balanceOf(amm.address)
+        controller_collateral.append(f"{amount:,.2f} {col.symbol}")
 
     peg_keepers_debt = {}
     peg_keepers_collateral = {}
-    for peg_keeper_address in policy.peg_keepers:
-        peg_keeper = PegKeeperContract(peg_keeper_address)
-        peg_keepers_debt[peg_keeper_address] = peg_keeper.debt / stablecoin.precision
-        pool = peg_keeper.pool
-        stableswap = StableswapContract(pool)
+    for pool_addr, peg_keeper in peg_keepers.items():
+        peg_keepers_debt[peg_keeper.address] = peg_keeper.debt / stablecoin.precision
+        stableswap = stableswaps[pool_addr]
         peg_keepers_collateral[
-            peg_keeper_address
-        ] = f"{stableswap.balanceOf(peg_keeper_address):,.2f} {stableswap.symbol}"
+            peg_keeper.address
+        ] = f"{stableswap.balanceOf(peg_keeper.address):,.2f} {stableswap.symbol}"
 
     return OverallStats(
         total_supply=total_supply,
@@ -65,26 +62,24 @@ class ControllerPosition(BaseModel):
 
 
 def get_positions() -> list[ControllerPosition]:
-    controller_collaterals = controller_factory.collaterals
-    controller_controllers = controller_factory.controllers
     controller_positions = []
 
-    for collateral_addr in controller_collaterals:
-        collateral = PredefinedERC20Contract(collateral_addr)
-        collateral_symbol = collateral.symbol
-        address = controller_controllers[collateral_addr]
-
-        controller = ControllerContract(address)
+    for col_addr, col in collaterals.items():
+        collateral_symbol = col.symbol
+        controller = controllers[col_addr]
         positions = []
 
         for i in range(controller.n_loans()):
             user = controller.loans(i)
             user_state = controller.user_state(user)
+            user_state[0] = user_state[0] / col.precision
+            user_state[1] = user_state[1] / stablecoin.precision
+            user_state[2] = user_state[2] / stablecoin.precision
             positions.append((user, *user_state))
 
         controller_positions.append(
             ControllerPosition(
-                address=address,
+                address=controller.address,
                 collateral=collateral_symbol,
                 positions=positions,
             )
