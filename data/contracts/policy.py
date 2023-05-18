@@ -2,10 +2,15 @@ from functools import cached_property
 
 from web3.constants import ADDRESS_ZERO
 
+from .abi.policy import abi
 from .base import Contract
 
 
 class PolicyContract(Contract):
+    @property
+    def abi(self):
+        return abi
+
     @cached_property
     def peg_keepers(self) -> list[str]:
         peg_keepers = []

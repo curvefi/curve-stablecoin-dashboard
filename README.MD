@@ -13,7 +13,7 @@ poetry install
 
 Put settings file ("_.env_") into [parent](.) directory.
 [Example](./.env-example) defines all required parameters, 
-external web3 provider and etherscan API token.
+external web3 provider.
 
 Other settings such as addresses of contracts are set in [settings](./settings.py)
 

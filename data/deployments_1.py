@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from .contracts import (
-    PredefinedERC20Contract,
+    ERC20Contract,
     amms,
     collaterals,
     controller_factory,
@@ -33,7 +33,7 @@ def get_deployments() -> Deployments:
             if coin_address == stablecoin.address:
                 coin = stablecoin
             else:
-                coin = PredefinedERC20Contract(coin_address)
+                coin = ERC20Contract(coin_address)
             coins.append(coin.symbol)
         stableswaps_addresses["-".join(coins)] = stableswap.address
 

@@ -4,28 +4,7 @@ from .base import Contract
 
 
 class ERC20Contract(Contract):
-    @cached_property
-    def name(self) -> str:
-        return self.contract.functions.name().call()
-
-    @cached_property
-    def symbol(self) -> str:
-        return self.contract.functions.symbol().call()
-
-    @cached_property
-    def precision(self) -> int:
-        decimals = self.contract.functions.decimals().call()
-        return 10**decimals
-
-    def total_supply(self) -> float:
-        return self.contract.functions.totalSupply().call() / self.precision
-
-    def balanceOf(self, address: str) -> float:
-        return self.contract.functions.balanceOf(address).call() / self.precision
-
-
-class PredefinedERC20Contract(ERC20Contract):
-    @cached_property
+    @property
     def abi(self) -> list[dict]:
         return [
             {
@@ -64,3 +43,22 @@ class PredefinedERC20Contract(ERC20Contract):
                 "type": "function",
             },
         ]
+
+    @cached_property
+    def name(self) -> str:
+        return self.contract.functions.name().call()
+
+    @cached_property
+    def symbol(self) -> str:
+        return self.contract.functions.symbol().call()
+
+    @cached_property
+    def precision(self) -> int:
+        decimals = self.contract.functions.decimals().call()
+        return 10**decimals
+
+    def total_supply(self) -> float:
+        return self.contract.functions.totalSupply().call() / self.precision
+
+    def balanceOf(self, address: str) -> float:
+        return self.contract.functions.balanceOf(address).call() / self.precision

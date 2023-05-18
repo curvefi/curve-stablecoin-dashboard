@@ -13,7 +13,6 @@ class Settings(BaseSettings):
         dotenv.load_dotenv(env_file)
 
     WEB3_PROVIDER_URL: str
-    ETHERSCAN_TOKEN: str
 
     Stablecoin: str = "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
     PriceOracle: str = "0x19F5B81e5325F882C9853B5585f74f751DE3896d"

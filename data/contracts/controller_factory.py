@@ -1,9 +1,14 @@
 from functools import cached_property
 
+from .abi.controller_factory import abi
 from .base import Contract
 
 
 class ControllerFactoryContract(Contract):
+    @property
+    def abi(self):
+        return abi
+
     @cached_property
     def n_collaterals(self) -> int:
         return self.contract.functions.n_collaterals().call()

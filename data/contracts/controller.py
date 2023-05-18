@@ -1,7 +1,12 @@
+from .abi.controller import abi
 from .base import Contract
 
 
 class ControllerContract(Contract):
+    @property
+    def abi(self):
+        return abi
+
     def n_loans(self) -> int:
         return self.contract.functions.n_loans().call()
 
