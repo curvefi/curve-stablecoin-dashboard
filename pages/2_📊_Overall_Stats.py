@@ -1,7 +1,6 @@
-import pandas as pd
 import streamlit as st
 
-from data.overall_stats_2 import get_overall_stats, get_positions
+from data.overall_stats_2 import get_overall_stats
 
 # Config
 st.set_page_config(page_title="Overall Stats", page_icon=":bar_chart:", layout="wide")
@@ -41,11 +40,3 @@ col3.write(
         ],
     )
 )
-
-# Positions
-positions = get_positions()
-
-for controller in positions:
-    st.write(f"Positions for {controller.collateral} [Controller](https://etherscan.io/address/{controller.address}):")
-    df = pd.DataFrame(controller.positions, columns=["user", "collateral", "stablecoin", "debt", "N"])
-    st.table(df.astype(str))
