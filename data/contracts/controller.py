@@ -23,3 +23,6 @@ class ControllerContract(Contract):
     def user_state(self, user: str) -> (float, float, float, int):
         # collateral, stablecoin, debt, N
         return self.contract.functions.user_state(user).call()
+
+    def user_health(self, user: str, full: bool) -> float:
+        return self.contract.functions.health(user, full).call() * 100 / 1e18

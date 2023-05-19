@@ -9,6 +9,8 @@ st.set_page_config(page_title="Positions", page_icon="💳", layout="wide")
 # Title
 st.title("Positions")
 
+full = st.checkbox("Show health full=true")
+
 # Positions
 controllers = get_controllers()
 if "pages" not in st.session_state:
@@ -29,8 +31,8 @@ for col_symbol in controllers:
     st.write(
         f"Positions for {col_symbol} [Controller](https://etherscan.io/address/{controllers[col_symbol]['controller']}):"
     )
-    positions = get_positions(controllers[col_symbol]["collateral"], pagination=pagination, page=page)
-    df = pd.DataFrame(positions.positions, columns=["n", "user", "collateral", "stablecoin", "debt", "N"])
+    positions = get_positions(controllers[col_symbol]["collateral"], full=full, pagination=pagination, page=page)
+    df = pd.DataFrame(positions.positions, columns=["n", "user", "collateral", "stablecoin", "debt", "N", "health"])
     st.table(df.astype(str))
 
     col1, col2, col3, col4 = st.columns(4)
