@@ -13,12 +13,12 @@ from .contracts import (
 
 class Collateral(BaseModel):
     controller_collateral: list[str]
-    peg_keepers_collateral: dict[str, str]
+    peg_keepers_collateral: dict[str, dict[str, str]]
 
 
 class Debt(BaseModel):
     controller_debt: float
-    peg_keepers_debt: dict[str, float]
+    peg_keepers_debt: dict[str, dict[str, float | str]]
 
 
 class OverallStats(BaseModel):
@@ -40,12 +40,15 @@ def get_overall_stats() -> OverallStats:
     peg_keepers_debt = {}
     peg_keepers_collateral = {}
     for pool_addr, peg_keeper in peg_keepers.items():
-        peg_keepers_debt[peg_keeper.address] = peg_keeper.debt / stablecoin.precision
         stableswap = stableswaps[pool_addr]
-        peg_keepers_collateral[
-            peg_keeper.address
-        ] = f"{stableswap.balanceOf(peg_keeper.address):,.2f} {stableswap.symbol}"
-
+        peg_keepers_debt[peg_keeper.address] = {
+            "name": stableswap.symbol,
+            "debt": peg_keeper.debt / stablecoin.precision,
+        }
+        peg_keepers_collateral[peg_keeper.address] = {
+            "name": stableswap.symbol,
+            "collateral": f"{stableswap.balanceOf(peg_keeper.address):,.2f} {stableswap.symbol}",
+        }
     return OverallStats(
         total_supply=total_supply,
         debt=Debt(controller_debt=controller_debt, peg_keepers_debt=peg_keepers_debt),
