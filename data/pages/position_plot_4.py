@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from data.contracts import amms, collaterals, controllers
-from data.utils import get_block_info
+from data.utils.utils import get_block_info
 
 
 def get_collaterals() -> dict:
@@ -34,7 +34,7 @@ def get_position_plot(col_addr: str, user: str, start_block: int, number_of_poin
     for point in points:
         h = controller.user_health(user, False, block_identifier=point)
         new_debt = controller.user_debt(user, block_identifier=point)
-        n1, n2 = amm.read_user_tick_numbers(user)
+        n1, n2 = amm.read_user_tick_numbers(user, block_identifier=point)
 
         if debt == 0 or abs(new_debt - debt) / debt > 0.001 or n1 != old_n1 or n2 != old_n2:
             # If we repaid here - don't include this step (whether it's up or down) in the loss

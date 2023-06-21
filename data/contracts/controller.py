@@ -40,7 +40,7 @@ class ControllerContract(Contract):
         ):
             return 0
 
-    def user_debt(self, user: str, block_identifier: BlockIdentifier = "latest") -> float:
+    def user_debt(self, user: str, block_identifier: BlockIdentifier = "latest") -> int:
         try:
             return self.contract.functions.debt(user).call(block_identifier=block_identifier)
         except (

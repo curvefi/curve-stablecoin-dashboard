@@ -6,6 +6,7 @@ from .controller_factory import ControllerFactoryContract
 from .erc20 import ERC20Contract
 from .peg_keeper import PegKeeperContract
 from .policy import PolicyContract
+from .price_aggregator import PriceAggregatorContract
 from .stablecoin import StablecoinContract
 from .stableswap import StableswapContract
 from .stableswap_factory import StableswapFactoryContract
@@ -14,6 +15,7 @@ from .stableswap_factory import StableswapFactoryContract
 stablecoin = StablecoinContract(settings.Stablecoin)
 stableswap_factory = StableswapFactoryContract(settings.Swapfactory)
 policy = PolicyContract(settings.Monetarypolicy)
+price_aggregator = PriceAggregatorContract(settings.PriceAggregator)
 
 # Imported values
 controller_factory = ControllerFactoryContract(stablecoin.minter)
