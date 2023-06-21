@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from .contracts import amms, collaterals, controllers
-from .utils import get_block_info
+from data.contracts import amms, collaterals, controllers
+from data.utils import get_block_info
 
 
 def get_collaterals() -> dict:

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from .contracts import collaterals, controllers, stablecoin
+from data.contracts import collaterals, controllers, stablecoin
 
 
 def get_controllers() -> dict:

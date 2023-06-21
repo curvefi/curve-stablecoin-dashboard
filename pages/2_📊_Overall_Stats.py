@@ -1,6 +1,6 @@
 import streamlit as st
 
-from data.overall_stats_2 import get_overall_stats
+from data.pages.overall_stats_2 import get_overall_stats
 
 # Config
 st.set_page_config(page_title="Overall Stats", page_icon=":bar_chart:", layout="wide")

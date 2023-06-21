@@ -1,6 +1,6 @@
 import streamlit as st
 
-from data.deployments_1 import get_deployments
+from data.pages.deployments_1 import get_deployments
 from settings import settings
 
 deployments = get_deployments()

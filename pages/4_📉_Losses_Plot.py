@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from data.position_plot_4 import get_collaterals, get_position_plot
+from data.pages.position_plot_4 import get_collaterals, get_position_plot
 
 # Config
 st.set_page_config(page_title="Position losses plot", page_icon="📉", layout="wide")

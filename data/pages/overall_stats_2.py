@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from .contracts import (
+from data.contracts import (
     amms,
     collaterals,
     controller_factory,
