@@ -39,15 +39,26 @@ for col_symbol in controllers:
 
     with col1:
         st.button(
-            "Previous", on_click=set_page, kwargs={"col_symbol": col_symbol, "page": page - 1}, disabled=page == 1
+            "Previous",
+            key=col_symbol + "previous",
+            on_click=set_page,
+            kwargs={"col_symbol": col_symbol, "page": page - 1},
+            disabled=page == 1,
         )
 
     with col2:
-        st.button("1", on_click=set_page, kwargs={"col_symbol": col_symbol, "page": 1}, disabled=page == 1)
+        st.button(
+            "1",
+            key=col_symbol + "1",
+            on_click=set_page,
+            kwargs={"col_symbol": col_symbol, "page": 1},
+            disabled=page == 1,
+        )
 
     with col3:
         st.button(
             "Last",
+            key=col_symbol + "last",
             on_click=set_page,
             kwargs={"col_symbol": col_symbol, "page": positions.n_loans // pagination + 1},
             disabled=page * pagination > positions.n_loans,
@@ -55,6 +66,7 @@ for col_symbol in controllers:
     with col4:
         st.button(
             "Next",
+            key=col_symbol + "next",
             on_click=set_page,
             kwargs={"col_symbol": col_symbol, "page": page + 1},
             disabled=page * pagination > positions.n_loans,

@@ -17,7 +17,7 @@ def get_position_plot(col_addr: str, user: str, start_block: int, number_of_poin
 
     points = list(range(start_block, end_block, (end_block - start_block) // number_of_points))
 
-    position_change_events = controller.get_position_change_evens(start_block, end_block)
+    position_change_events = controller.get_position_change_evens(start_block, end_block, user)
     points.extend([e["blockNumber"] for e in position_change_events])
     points.extend([e["blockNumber"] - 1 for e in position_change_events])
     points = sorted(set(points))

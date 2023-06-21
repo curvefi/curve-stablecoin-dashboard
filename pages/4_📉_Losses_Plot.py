@@ -14,12 +14,17 @@ st.caption("This plot uses a lot of web3 provider calls - might be slower than o
 col1, col2, col3 = st.columns(3)
 
 collaterals = get_collaterals()
+# TODO: replace with controller deployment blocks
+start_blocks = {
+    "sfrxETH": 17264365,
+    "wstETH": 17432225,
+}
 
 with col1:
     amm_collateral = st.selectbox("Select AMM of  position", collaterals.keys())
     selected_collateral = collaterals[amm_collateral]
 with col2:
-    start_block = st.number_input("Block number of position start", value=17264365)
+    start_block = st.number_input("Block number of position start", value=start_blocks[amm_collateral])
 with col3:
     number_of_points = st.number_input("Number of points in plot", value=20)
 

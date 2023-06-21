@@ -1,7 +1,8 @@
 from functools import cached_property
 from typing import Iterable
 
-from web3.contract import ContractEvent
+from web3.contract.contract import ContractEvent
+from web3.exceptions import BadFunctionCallOutput, ContractLogicError
 from web3.types import BlockIdentifier, EventData
 
 from .abi.controller import abi
@@ -31,10 +32,22 @@ class ControllerContract(Contract):
         return self.contract.functions.user_state(user).call()
 
     def user_health(self, user: str, full: bool, block_identifier: BlockIdentifier = "latest") -> float:
-        return self.contract.functions.health(user, full).call(block_identifier=block_identifier) * 100 / 1e18
+        try:
+            return self.contract.functions.health(user, full).call(block_identifier=block_identifier) * 100 / 1e18
+        except (
+            BadFunctionCallOutput,
+            ContractLogicError,
+        ):
+            return 0
 
     def user_debt(self, user: str, block_identifier: BlockIdentifier = "latest") -> float:
-        return self.contract.functions.debt(user).call(block_identifier=block_identifier)
+        try:
+            return self.contract.functions.debt(user).call(block_identifier=block_identifier)
+        except (
+            BadFunctionCallOutput,
+            ContractLogicError,
+        ):
+            return 0
 
     ### Events ###
     @cached_property
@@ -53,21 +66,34 @@ class ControllerContract(Contract):
     def liquidate_event(self) -> ContractEvent:
         return self.contract.events.Liquidate
 
-    def get_borrow_events(self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier) -> Iterable[EventData]:
-        return self.borrow_event.getLogs(fromBlock=fromBlock, toBlock=toBlock)
+    def get_borrow_events(
+        self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier, user: str = None
+    ) -> Iterable[EventData]:
+        argument_filters = {"user": user} if user else None
+        return self.borrow_event.get_logs(argument_filters=argument_filters, fromBlock=fromBlock, toBlock=toBlock)
 
-    def get_repay_events(self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier) -> Iterable[EventData]:
-        return self.repay_event.getLogs(fromBlock=fromBlock, toBlock=toBlock)
+    def get_repay_events(
+        self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier, user: str = None
+    ) -> Iterable[EventData]:
+        argument_filters = {"user": user} if user else None
+        return self.repay_event.get_logs(argument_filters=argument_filters, fromBlock=fromBlock, toBlock=toBlock)
 
-    def get_remove_collateral_events(self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier) -> Iterable[EventData]:
-        return self.remove_collateral_event.getLogs(fromBlock=fromBlock, toBlock=toBlock)
+    def get_remove_collateral_events(
+        self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier, user: str = None
+    ) -> Iterable[EventData]:
+        argument_filters = {"user": user} if user else None
+        return self.remove_collateral_event.get_logs(
+            argument_filters=argument_filters, fromBlock=fromBlock, toBlock=toBlock
+        )
 
     def get_liquidate_events(self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier) -> Iterable[EventData]:
-        return self.liquidate_event.getLogs(fromBlock=fromBlock, toBlock=toBlock)
+        return self.liquidate_event.get_logs(fromBlock=fromBlock, toBlock=toBlock)
 
-    def get_position_change_evens(self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier) -> Iterable[EventData]:
+    def get_position_change_evens(
+        self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier, user: str = None
+    ) -> Iterable[EventData]:
         events = list()
-        events.extend(self.get_borrow_events(fromBlock, toBlock))
-        events.extend(self.get_repay_events(fromBlock, toBlock))
-        events.extend(self.get_remove_collateral_events(fromBlock, toBlock))
+        events.extend(self.get_borrow_events(fromBlock, toBlock, user))
+        events.extend(self.get_repay_events(fromBlock, toBlock, user))
+        events.extend(self.get_remove_collateral_events(fromBlock, toBlock, user))
         return events
