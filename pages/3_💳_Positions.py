@@ -16,6 +16,8 @@ controllers = get_controllers()
 if "pages" not in st.session_state:
     st.session_state.pages = {}
 
+positions = {col_symbol: get_positions(controllers[col_symbol]["collateral"], full=full) for col_symbol in controllers}
+
 
 def set_page(col_symbol: str, page: int):
     st.session_state.pages[col_symbol] = page
@@ -27,12 +29,16 @@ for col_symbol in controllers:
 
     page = st.session_state.pages[col_symbol]
     pagination = 10
+    n_loans = positions[col_symbol].n_loans
 
     st.write(
         f"Positions for {col_symbol} [Controller](https://etherscan.io/address/{controllers[col_symbol]['controller']}):"
     )
-    positions = get_positions(controllers[col_symbol]["collateral"], full=full, pagination=pagination, page=page)
-    df = pd.DataFrame(positions.positions, columns=["n", "user", "collateral", "stablecoin", "debt", "N", "health"])
+    curr_positions = positions[col_symbol].positions[(page - 1) * pagination : min(n_loans, page * pagination)]
+    df = pd.DataFrame(
+        [(p.i, p.user, *p.user_state, p.health) for p in curr_positions],
+        columns=["n", "user", "collateral", "stablecoin", "debt", "N", "health"],
+    )
     st.table(df.astype(str))
 
     col1, col2, col3, col4 = st.columns(4)
@@ -60,8 +66,8 @@ for col_symbol in controllers:
             "Last",
             key=col_symbol + "last",
             on_click=set_page,
-            kwargs={"col_symbol": col_symbol, "page": positions.n_loans // pagination + 1},
-            disabled=page * pagination > positions.n_loans,
+            kwargs={"col_symbol": col_symbol, "page": n_loans // pagination + 1},
+            disabled=page * pagination > n_loans,
         )
     with col4:
         st.button(
@@ -69,5 +75,5 @@ for col_symbol in controllers:
             key=col_symbol + "next",
             on_click=set_page,
             kwargs={"col_symbol": col_symbol, "page": page + 1},
-            disabled=page * pagination > positions.n_loans,
+            disabled=page * pagination > n_loans,
         )

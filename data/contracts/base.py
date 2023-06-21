@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
 from functools import cached_property
 
-from web3 import Web3
+from web3 import AsyncWeb3, Web3
 from web3.contract import Contract as Web3Contract
 
-from settings import web3_provider
+from settings import async_web3_provider, web3_provider
 
 
 class Contract(ABC):
     def __init__(self, address: str):
         self.web3 = Web3(web3_provider)
+        self.async_web3 = AsyncWeb3(async_web3_provider)
         self.address = address
 
     @property

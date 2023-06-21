@@ -23,3 +23,4 @@ class Settings(BaseSettings):
 
 settings = Settings()
 web3_provider = Web3.HTTPProvider(settings.WEB3_PROVIDER_URL)
+async_web3_provider = Web3.AsyncHTTPProvider(settings.WEB3_PROVIDER_URL)
