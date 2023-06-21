@@ -1,4 +1,5 @@
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from data.pages.position_plot_4 import get_collaterals, get_position_plot
@@ -32,6 +33,13 @@ user = st.text_input("User", placeholder="Insert address here")
 
 if user:
     times, losses = get_position_plot(selected_collateral, user, start_block, number_of_points)
-    data = pd.DataFrame({"times": times, "losses": losses}).set_index("times")
-
-    st.line_chart(data)
+    df = pd.DataFrame(
+        {
+            "Times": times,
+            "Losses": losses,
+        }
+    )
+    fig = px.line(df, x="Times", y="Losses", title="Position losses")
+    fig.update_layout(showlegend=False, xaxis_title="Date", yaxis_title="Loss [%]")
+    fig.update_traces(hovertemplate="%{y:.10f}<extra></extra>")
+    st.plotly_chart(fig, use_container_width=True)

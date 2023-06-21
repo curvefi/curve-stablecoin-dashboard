@@ -27,9 +27,9 @@ class ControllerContract(Contract):
         upper, lower = upper / 1e18, lower / 1e18
         return lower, upper
 
-    def user_state(self, user: str) -> (float, float, float, int):
+    def user_state(self, user: str, block_identifier: BlockIdentifier = "latest") -> (float, float, float, int):
         # collateral, stablecoin, debt, N
-        return self.contract.functions.user_state(user).call()
+        return self.contract.functions.user_state(user).call(block_identifier=block_identifier)
 
     def user_health(self, user: str, full: bool, block_identifier: BlockIdentifier = "latest") -> float:
         try:
@@ -43,6 +43,28 @@ class ControllerContract(Contract):
     def user_debt(self, user: str, block_identifier: BlockIdentifier = "latest") -> int:
         try:
             return self.contract.functions.debt(user).call(block_identifier=block_identifier)
+        except (
+            BadFunctionCallOutput,
+            ContractLogicError,
+        ):
+            return 0
+
+    async def async_user_health(self, user: str, full: bool, block_identifier: BlockIdentifier = "latest") -> float:
+        try:
+            return (
+                (await self.async_contract.functions.health(user, full).call(block_identifier=block_identifier))
+                * 100
+                / 1e18
+            )
+        except (
+            BadFunctionCallOutput,
+            ContractLogicError,
+        ):
+            return 0
+
+    async def async_user_debt(self, user: str, block_identifier: BlockIdentifier = "latest") -> int:
+        try:
+            return await self.async_contract.functions.debt(user).call(block_identifier=block_identifier)
         except (
             BadFunctionCallOutput,
             ContractLogicError,

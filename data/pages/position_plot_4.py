@@ -1,18 +1,21 @@
 from datetime import datetime
 
 from data.contracts import amms, collaterals, controllers
-from data.utils.utils import get_block_info
+from data.utils.utils import await_awaitable, get_block_info
 
 
 def get_collaterals() -> dict:
     return {col.symbol: col_addr for col_addr, col in collaterals.items()}
 
 
-def get_position_plot(col_addr: str, user: str, start_block: int, number_of_points: int) -> (list, list):
+async def async_get_position_plot(
+    col_addr: str, user: str, start_block: int, number_of_points: int
+) -> (list[datetime], list[float]):
     amm = amms[col_addr]
     controller = controllers[col_addr]
     start_block, start_block_time = get_block_info(start_block)
     end_block, end_block_time = get_block_info("latest")
+    # This is to reduce number of web3 calls, approximate
     time_per_block = (end_block_time - start_block_time) / (end_block - start_block)
 
     points = list(range(start_block, end_block, (end_block - start_block) // number_of_points))
@@ -32,9 +35,9 @@ def get_position_plot(col_addr: str, user: str, start_block: int, number_of_poin
     old_n2 = 2**256 - 1
 
     for point in points:
-        h = controller.user_health(user, False, block_identifier=point)
-        new_debt = controller.user_debt(user, block_identifier=point)
-        n1, n2 = amm.read_user_tick_numbers(user, block_identifier=point)
+        h = await controller.async_user_health(user, False, block_identifier=point)
+        new_debt = await controller.async_user_debt(user, block_identifier=point)
+        n1, n2 = await amm.async_read_user_tick_numbers(user, block_identifier=point)
 
         if debt == 0 or abs(new_debt - debt) / debt > 0.001 or n1 != old_n1 or n2 != old_n2:
             # If we repaid here - don't include this step (whether it's up or down) in the loss
@@ -49,3 +52,9 @@ def get_position_plot(col_addr: str, user: str, start_block: int, number_of_poin
         losses.append(nh)
 
     return times, losses
+
+
+def get_position_plot(
+    col_addr: str, user: str, start_block: int, number_of_points: int
+) -> (list[datetime], list[float]):
+    return await_awaitable(async_get_position_plot(col_addr, user, start_block, number_of_points))

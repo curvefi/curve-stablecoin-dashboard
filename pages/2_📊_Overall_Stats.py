@@ -48,13 +48,20 @@ col2.write(
     )
 )
 
+prices_data = [stats.prices[address]["price"] for address in stats.prices]
+
 prices = pd.DataFrame(
     {
         "Stableswap": [stats.prices[address]["name"] for address in stats.prices],
-        "Prices": [stats.prices[address]["price"] for address in stats.prices],
+        "Prices": prices_data,
     }
 )
-fig = px.bar(prices, x="Stableswap", y="Prices", color="Stableswap", title="Stableswaps prices", log_y=True)
-fig.update_layout(showlegend=False, xaxis_title=None, yaxis_title="Price [USD]")
+fig = px.bar(prices, x="Stableswap", y="Prices", color="Stableswap", title="Stableswaps prices")
+fig.update_layout(
+    showlegend=False,
+    xaxis_title=None,
+    yaxis_title="Price [USD]",
+    yaxis_range=[min(prices_data) * 0.999, max(prices_data) * 1.001],
+)
 fig.update_traces(hovertemplate="%{y:.10f}<extra></extra>")
-st.plotly_chart(fig, use_container_width=True, theme=None)
+st.plotly_chart(fig, use_container_width=True)
