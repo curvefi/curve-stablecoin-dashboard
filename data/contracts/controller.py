@@ -111,7 +111,7 @@ class ControllerContract(Contract):
     def get_liquidate_events(self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier) -> Iterable[EventData]:
         return self.liquidate_event.get_logs(fromBlock=fromBlock, toBlock=toBlock)
 
-    def get_position_change_evens(
+    def get_position_change_events(
         self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier, user: str = None
     ) -> Iterable[EventData]:
         events = list()

@@ -20,7 +20,7 @@ async def async_get_position_plot(
 
     points = list(range(start_block, end_block, (end_block - start_block) // number_of_points))
 
-    position_change_events = controller.get_position_change_evens(start_block, end_block, user)
+    position_change_events = controller.get_position_change_events(start_block, end_block, user)
     points.extend([e["blockNumber"] for e in position_change_events])
     points.extend([e["blockNumber"] - 1 for e in position_change_events])
     points = sorted(set(points))
