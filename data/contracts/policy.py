@@ -2,6 +2,8 @@ from functools import cached_property
 
 from web3.constants import ADDRESS_ZERO
 
+from data.utils.multicall import multicall
+
 from .abi.policy import abi
 from .base import Contract
 
@@ -13,15 +15,6 @@ class PolicyContract(Contract):
 
     @cached_property
     def peg_keepers(self) -> list[str]:
-        peg_keepers = []
-        i = 0
-        while True:
-            curr = self.contract.functions.peg_keepers(i).call()
-
-            if curr != ADDRESS_ZERO:
-                peg_keepers.append(curr)
-                i += 1
-            else:
-                break
-
-        return peg_keepers
+        calls = [self.contract.functions.peg_keepers(i) for i in range(10)]
+        pools = multicall.try_aggregate(calls)
+        return [p for p in pools if p != ADDRESS_ZERO]

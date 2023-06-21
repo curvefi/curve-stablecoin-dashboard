@@ -1,5 +1,7 @@
 from functools import cached_property
 
+from data.utils.multicall import multicall
+
 from .abi.stableswap_factory import abi
 from .base import Contract
 
@@ -15,7 +17,6 @@ class StableswapFactoryContract(Contract):
 
     @cached_property
     def pools(self) -> list[str]:
-        pools = []
-        for i in range(self.pool_count):
-            pools.append(self.contract.functions.pool_list(i).call())
+        calls = [self.contract.functions.pool_list(i) for i in range(self.pool_count)]
+        pools = multicall.try_aggregate(calls)
         return pools
