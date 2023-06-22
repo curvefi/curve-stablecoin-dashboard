@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from data.pages.postitions_3 import get_controllers, get_positions
+from data.pages.positions_5 import get_controllers, get_positions
 
 # Config
 st.set_page_config(page_title="Positions", page_icon="💳", layout="wide")

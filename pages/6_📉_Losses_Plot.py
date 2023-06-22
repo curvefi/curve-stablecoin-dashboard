@@ -2,7 +2,9 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from data.pages.position_plot_4 import get_collaterals, get_position_plot
+from data.pages import get_collaterals
+from data.pages.position_plot_6 import get_position_plot
+from data.utils.constants import start_blocks
 
 # Config
 st.set_page_config(page_title="Position losses plot", page_icon="📉", layout="wide")
@@ -15,11 +17,6 @@ st.caption("This plot uses a lot of web3 provider calls - might be slower than o
 col1, col2, col3 = st.columns(3)
 
 collaterals = get_collaterals()
-# TODO: replace with controller deployment blocks
-start_blocks = {
-    "sfrxETH": 17264365,
-    "wstETH": 17432225,
-}
 
 with col1:
     amm_collateral = st.selectbox("Select AMM of  position", collaterals.keys())

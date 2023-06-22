@@ -1,11 +1,7 @@
 from datetime import datetime
 
-from data.contracts import amms, collaterals, controllers
+from data.contracts import amms, controllers
 from data.utils.utils import await_awaitable, get_block_info
-
-
-def get_collaterals() -> dict:
-    return {col.symbol: col_addr for col_addr, col in collaterals.items()}
 
 
 async def async_get_position_plot(
