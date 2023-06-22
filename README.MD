@@ -1,5 +1,7 @@
 # Curve Stablecoin dashboard
 
+Full DApp local dashboard for CRVUSD stats
+
 ## Quickstart
 
 ### Install packages using poetry
@@ -24,3 +26,10 @@ streamlit run Dashboard.py
 ```
 
 Dashboard will be available at http://localhost:8502 (browser opens automatically).
+
+## Features
+
+- Deployments, contract addresses for Controllers, Stableswaps, AMMs and other
+- Total dept, total collateral, prices
+- Plots for CRVUSD/USD and borrow rates
+- Positions, health and losses calculator
