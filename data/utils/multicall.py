@@ -21,7 +21,6 @@ class MaxRetriesExceeded(Exception):
 
 class Multicall:
     def __init__(self, address: str, provider: Web3.HTTPProvider, batch: int = 100, max_retries: int = 3):
-
         self.web3 = Web3(provider)
         self.max_retries = max_retries
         self.batch = batch

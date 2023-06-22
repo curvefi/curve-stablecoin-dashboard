@@ -32,7 +32,8 @@ for col_symbol in controllers:
     n_loans = positions[col_symbol].n_loans
 
     st.write(
-        f"Positions for {col_symbol} [Controller](https://etherscan.io/address/{controllers[col_symbol]['controller']}):"
+        f"Positions for {col_symbol} "
+        f"[Controller](https://etherscan.io/address/{controllers[col_symbol]['controller']}), total: {n_loans}:"
     )
     curr_positions = positions[col_symbol].positions[(page - 1) * pagination : min(n_loans, page * pagination)]
     df = pd.DataFrame(
