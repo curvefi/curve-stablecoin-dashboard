@@ -14,3 +14,9 @@ class AmmContract(Contract):
 
     async def async_read_user_tick_numbers(self, user: str, block_identifier: BlockIdentifier = "latest") -> (int, int):
         return await self.async_contract.functions.read_user_tick_numbers(user).call(block_identifier=block_identifier)
+
+    def price_oracle(self, block_identifier: BlockIdentifier = "latest") -> int:
+        return self.contract.functions.price_oracle().call(block_identifier=block_identifier)
+
+    async def async_price_oracle(self, block_identifier: BlockIdentifier = "latest") -> int:
+        return await self.async_contract.functions.price_oracle().call(block_identifier=block_identifier)

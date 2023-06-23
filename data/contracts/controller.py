@@ -49,6 +49,12 @@ class ControllerContract(Contract):
         ):
             return 0
 
+    async def async_user_state(
+        self, user: str, block_identifier: BlockIdentifier = "latest"
+    ) -> (float, float, float, int):
+        # collateral, stablecoin, debt, N
+        return await self.async_contract.functions.user_state(user).call(block_identifier=block_identifier)
+
     async def async_user_health(self, user: str, full: bool, block_identifier: BlockIdentifier = "latest") -> float:
         try:
             return (
@@ -108,8 +114,11 @@ class ControllerContract(Contract):
             argument_filters=argument_filters, fromBlock=fromBlock, toBlock=toBlock
         )
 
-    def get_liquidate_events(self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier) -> Iterable[EventData]:
-        return self.liquidate_event.get_logs(fromBlock=fromBlock, toBlock=toBlock)
+    def get_liquidate_events(
+        self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier, user: str = None
+    ) -> Iterable[EventData]:
+        argument_filters = {"user": user} if user else None
+        return self.liquidate_event.get_logs(argument_filters=argument_filters, fromBlock=fromBlock, toBlock=toBlock)
 
     def get_position_change_events(
         self, fromBlock: BlockIdentifier, toBlock: BlockIdentifier, user: str = None
