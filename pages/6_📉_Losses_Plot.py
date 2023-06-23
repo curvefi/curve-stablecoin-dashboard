@@ -44,7 +44,7 @@ if user:
             ),
         ]
     )
-    liquidation_ranges = [
+    shapes = [
         {
             "type": "rect",
             "xref": "x",
@@ -53,14 +53,14 @@ if user:
             "y0": "0",
             "x1": sl[1],
             "y1": max(position.losses),
-            "fillcolor": "lightpink",
+            "fillcolor": "lightgrey",
             "opacity": 0.3,
             "line_width": 0,
             "layer": "below",
         }
         for sl in position.soft_liquidation
     ]
-    liquidation_ranges.extend(
+    shapes.extend(
         [
             {
                 "type": "rect",
@@ -70,12 +70,31 @@ if user:
                 "y0": "0",
                 "x1": sl[1],
                 "y1": max(position.losses),
-                "fillcolor": "red",
+                "fillcolor": "lightpink",
                 "opacity": 0.2,
                 "line_width": 0,
                 "layer": "below",
             }
             for sl in position.hard_liquidation
+        ]
+    )
+
+    shapes.extend(
+        [
+            {
+                "type": "rect",
+                "xref": "x",
+                "yref": "y2",
+                "x0": b.x1,
+                "y0": b.y1,
+                "x1": b.x2,
+                "y1": b.y2,
+                "fillcolor": "lightyellow",
+                "opacity": 0.3,
+                "line_width": 0,
+                "layer": "below",
+            }
+            for b in position.user_bands
         ]
     )
 
@@ -86,7 +105,7 @@ if user:
         yaxis2=dict(title="Collateral Prices [crvUSD]", overlaying="y", side="right"),
         legend=dict(x=0, y=1, xanchor="left", yanchor="top"),
         font=dict(family="Courier New, monospace"),
-        shapes=liquidation_ranges,
+        shapes=shapes,
     )
     fig.update_traces(hovertemplate="%{y:.3f}<extra></extra>", line=dict(width=3))
 

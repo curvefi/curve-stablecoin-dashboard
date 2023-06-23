@@ -3,13 +3,21 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from data.contracts import amms, collaterals, controllers
-from data.utils.utils import await_awaitable, get_block_info
+from data.utils.multicall import multicall
+from data.utils.utils import get_block_info
 
 
 class EventList(BaseModel):
     x: list[datetime]
     y: list[float]
     text: list[str]
+
+
+class Band(BaseModel):
+    x1: datetime
+    x2: datetime
+    y1: float
+    y2: float
 
 
 class Position(BaseModel):
@@ -21,9 +29,10 @@ class Position(BaseModel):
 
     soft_liquidation: list[list[datetime]]  # points of soft liquidation
     hard_liquidation: list[list[datetime]]  # points of hard liquidation
+    user_bands: list[Band]
 
 
-async def async_get_position_plot(col_addr: str, user: str, start_block: int, number_of_points: int) -> Position:
+def get_position_plot(col_addr: str, user: str, start_block: int, number_of_points: int) -> Position:
     amm = amms[col_addr]
     controller = controllers[col_addr]
     collateral = collaterals[col_addr]
@@ -60,6 +69,9 @@ async def async_get_position_plot(col_addr: str, user: str, start_block: int, nu
     remove_collateral_events = EventList(x=[], y=[], text=[])
     liquidate_events = EventList(x=[], y=[], text=[])
 
+    user_bands = []
+    current_x = None
+
     debt = 0
     old_h = 0
     nh = 0
@@ -67,10 +79,23 @@ async def async_get_position_plot(col_addr: str, user: str, start_block: int, nu
     old_n2 = 2**256 - 1
 
     for point in points:
-        h = await controller.async_user_health(user, False, block_identifier=point)
-        user_state = await controller.async_user_state(user, block_identifier=point)
-        n1, n2 = await amm.async_read_user_tick_numbers(user, block_identifier=point)
-        price = (await amm.async_price_oracle(block_identifier=point)) / collateral.precision
+        calls = [
+            controller.contract.functions.health(user, False),
+            controller.contract.functions.user_state(user),
+            amm.contract.functions.read_user_tick_numbers(user),
+            amm.contract.functions.price_oracle(),
+            amm.contract.functions.get_base_price(),
+            amm.contract.functions.A(),
+        ]
+        h, user_state, (n1, n2), price, base_price, A = multicall.try_aggregate(calls, block_identifier=point)
+        h, user_state, (n1, n2), price, base_price, A = (
+            h * 100 / 1e18 if h else 0,
+            user_state,
+            (n1, n2),
+            price / collateral.precision,
+            base_price / collateral.precision,
+            A,
+        )
 
         prices.append(price)
         healths.append(h)
@@ -122,6 +147,15 @@ async def async_get_position_plot(col_addr: str, user: str, start_block: int, nu
             repay_events.y.append(nh)
             repay_events.text.append("Repay")
 
+        if not current_x:
+            current_x = time
+            continue
+
+        user_bands.append(
+            Band(x1=current_x, x2=time, y1=base_price * ((A - 1) / A) ** n1, y2=base_price * ((A - 1) / A) ** n2)
+        )
+        current_x = time
+
     if current_soft_start:
         soft_liquidation.append([current_soft_start, time])
     if current_hard_start:
@@ -139,8 +173,5 @@ async def async_get_position_plot(col_addr: str, user: str, start_block: int, nu
             y=[*borrow_events.y, *repay_events.y, *remove_collateral_events.y, *liquidate_events.y],
             text=[*borrow_events.text, *repay_events.text, *remove_collateral_events.text, *liquidate_events.text],
         ),
+        user_bands=user_bands,
     )
-
-
-def get_position_plot(col_addr: str, user: str, start_block: int, number_of_points: int) -> Position:
-    return await_awaitable(async_get_position_plot(col_addr, user, start_block, number_of_points))
