@@ -42,6 +42,31 @@ if user:
                 textposition="top center",
                 name="Events",
             ),
+            # To appear in legend
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                marker=dict(size=15, color="lightgrey"),
+                name="Soft liquidation ranges",
+                opacity=0.5,
+            ),
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                marker=dict(size=15, color="lightpink"),
+                name="Hard liquidation ranges",
+                opacity=0.5,
+            ),
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                marker=dict(size=15, color="yellow"),
+                name="User bands",
+                opacity=0.5,
+            ),
         ]
     )
     shapes = [
@@ -89,7 +114,7 @@ if user:
                 "y0": b.y1,
                 "x1": b.x2,
                 "y1": b.y2,
-                "fillcolor": "lightyellow",
+                "fillcolor": "yellow",
                 "opacity": 0.3,
                 "line_width": 0,
                 "layer": "below",
@@ -103,7 +128,7 @@ if user:
         xaxis_title="Dates",
         yaxis_title="Position losses [%]",
         yaxis2=dict(title="Collateral Prices [crvUSD]", overlaying="y", side="right"),
-        legend=dict(x=0, y=1, xanchor="left", yanchor="top"),
+        legend=dict(orientation="h", x=0, y=-0.2, xanchor="left", yanchor="top"),
         font=dict(family="Courier New, monospace"),
         shapes=shapes,
     )
