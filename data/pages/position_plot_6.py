@@ -92,8 +92,8 @@ def get_position_plot(col_addr: str, user: str, start_block: int, number_of_poin
             h * 100 / 1e18 if h else 0,
             user_state,
             (n1, n2),
-            price / collateral.precision,
-            base_price / collateral.precision,
+            price / 1e18,
+            base_price / 1e18,
             A,
         )
 

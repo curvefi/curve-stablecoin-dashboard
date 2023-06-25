@@ -12,18 +12,23 @@ st.title("Overall Stats")
 
 stats = get_overall_stats()
 
-col1, col2 = st.columns([0.5, 0.5])
+col1, col2 = st.columns([0.4, 0.6])
 with col1:
     st.metric("Total Supply", f"{stats.total_supply:,.2f}")
 with col2:
     st.metric("Peg", f"{stats.peg}")
 
-column_sizes = [0.5, 0.5]
+column_sizes = [0.4, 0.6]
 col1, col2 = st.columns(column_sizes)
 col1.metric(
     "Total Debt", f"{stats.debt.controller_debt + sum([d['debt'] for d in stats.debt.peg_keepers_debt.values()]):,.2f}"
 )
-col2.metric("Total Collateral", "; ".join(stats.total_collateral.controller_collateral))
+with col2:
+    st.write("Total Collateral")
+    columns = st.columns(len(stats.total_collateral.controller_collateral))
+    for i, controller_collateral in enumerate(stats.total_collateral.controller_collateral):
+        with columns[i]:
+            st.header(controller_collateral)
 
 
 col1, col2 = st.columns(column_sizes)
