@@ -1,9 +1,9 @@
 import plotly.graph_objects as go
 import streamlit as st
 
-from data.pages import get_collaterals
-from data.pages.position_plot_6 import get_position_plot
-from data.utils.constants import start_blocks
+from data.pages import get_lending_collaterals
+from data.pages.position_plot_7 import get_position_plot
+from data.utils.constants import default_start_block, start_blocks
 
 # Config
 st.set_page_config(page_title="Position losses plot", page_icon="📉", layout="wide")
@@ -15,13 +15,15 @@ st.caption("This plot uses a lot of web3 provider calls - might be slower than o
 
 col1, col2, col3 = st.columns(3)
 
-collaterals = get_collaterals()
+collaterals = get_lending_collaterals()
 
 with col1:
     amm_collateral = st.selectbox("Select AMM of  position", collaterals.keys())
     selected_collateral = collaterals[amm_collateral]
 with col2:
-    start_block = st.number_input("Block number of position start", value=start_blocks[amm_collateral])
+    start_block = st.number_input(
+        "Block number of position start", value=start_blocks.get(amm_collateral) or default_start_block
+    )
 with col3:
     number_of_points = st.number_input("Number of points in plot", value=30)
 
@@ -77,7 +79,7 @@ if user:
             "x0": sl[0],
             "y0": "0",
             "x1": sl[1],
-            "y1": max(position.prices),
+            "y1": max(position.losses),
             "fillcolor": "lightgrey",
             "opacity": 0.3,
             "line_width": 0,
@@ -94,7 +96,7 @@ if user:
                 "x0": sl[0],
                 "y0": "0",
                 "x1": sl[1],
-                "y1": max(position.losses),
+                "y1": max(position.prices),
                 "fillcolor": "lightpink",
                 "opacity": 0.2,
                 "line_width": 0,

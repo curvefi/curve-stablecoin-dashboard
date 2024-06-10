@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     Swapfactory: str = "0x4F8846Ae9380B90d2E71D5e3D042dff3E7ebb40d"
     PriceAggregator: str = "0xe5Afcf332a5457E8FafCD668BcE3dF953762Dfe7"
 
+    OneWayLendingFactory: str = "0xeA6876DDE9e3467564acBeE1Ed5bac88783205E0"
+
 
 settings = Settings()
 web3_provider = Web3.HTTPProvider(settings.WEB3_PROVIDER_URL)

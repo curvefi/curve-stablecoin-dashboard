@@ -4,6 +4,8 @@ from .amm import AmmContract
 from .controller import ControllerContract
 from .controller_factory import ControllerFactoryContract
 from .erc20 import ERC20Contract
+from .lending__one_way_factory import OneWayLendingFactoryContract
+from .lending__vault import LendingVaultContract
 from .peg_keeper import PegKeeperContract
 from .policy import PolicyContract
 from .price_aggregator import PriceAggregatorContract
@@ -30,4 +32,23 @@ stableswaps: dict[str, StableswapContract] = {
 }
 peg_keepers: dict[str, PegKeeperContract] = {
     PegKeeperContract(pg_addr).pool: PegKeeperContract(pg_addr) for pg_addr in policy.peg_keepers
+}
+
+
+# Lending
+one_way_factory = OneWayLendingFactoryContract(settings.OneWayLendingFactory)
+lending_collaterals: dict[str, ERC20Contract] = {
+    one_way_factory.collateral_tokens(i): ERC20Contract(one_way_factory.collateral_tokens(i))
+    for i in range(one_way_factory.market_count)
+}
+lending_amms: dict[str, AmmContract] = {
+    one_way_factory.collateral_tokens(i): AmmContract(one_way_factory.amms(i))
+    for i in range(one_way_factory.market_count)
+}
+lending_vaults: dict[str, LendingVaultContract] = {
+    one_way_factory.collateral_tokens(i): LendingVaultContract(one_way_factory.vaults(i))
+    for i in range(one_way_factory.market_count)
+}
+lending_controllers: dict[str, ControllerContract] = {
+    k: ControllerContract(val.controller) for k, val in lending_vaults.items()
 }

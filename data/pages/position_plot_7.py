@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from data.contracts import amms, controllers
+from data.contracts import lending_amms, lending_controllers
 from data.utils.multicall import multicall
 from data.utils.utils import get_block_info
 
@@ -33,8 +33,9 @@ class Position(BaseModel):
 
 
 def get_position_plot(col_addr: str, user: str, start_block: int, number_of_points: int) -> Position:
-    amm = amms[col_addr]
-    controller = controllers[col_addr]
+    amm = lending_amms[col_addr]
+    controller = lending_controllers[col_addr]
+    # collateral = lending_collaterals[col_addr]
 
     start_block, start_block_time = get_block_info(start_block)
     end_block, end_block_time = get_block_info("latest")
