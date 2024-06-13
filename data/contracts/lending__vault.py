@@ -10,3 +10,7 @@ class LendingVaultContract(Contract):
     @property
     def controller(self) -> str:
         return self.contract.functions.controller().call()
+
+    @property
+    def price_oracle(self) -> str:
+        return self.contract.functions.price_oracle().call()

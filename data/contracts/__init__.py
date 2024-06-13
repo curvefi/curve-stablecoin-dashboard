@@ -5,6 +5,7 @@ from .controller import ControllerContract
 from .controller_factory import ControllerFactoryContract
 from .erc20 import ERC20Contract
 from .lending__one_way_factory import OneWayLendingFactoryContract
+from .lending__price_oracle import LendingPriceOracleContract
 from .lending__vault import LendingVaultContract
 from .peg_keeper import PegKeeperContract
 from .policy import PolicyContract

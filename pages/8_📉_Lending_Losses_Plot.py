@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from data.pages import get_lending_collaterals
-from data.pages.position_plot_7 import get_position_plot
+from data.pages.position_plot_8 import get_position_plot
 from data.utils.constants import default_start_block, start_blocks
 
 # Config
